@@ -36,7 +36,7 @@ pipeline {
                         cd 01-VPC
                         if [ ${params.PICKONE} == 'apply' ]
                         then
-                            terraform apply -auto-approve
+                            terraform apply -auto-approve vpc.txt
                         elif [ ${params.PICKONE} == 'destroy' ]
                             terraform destroy -auto-approve
                         fi
