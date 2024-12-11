@@ -21,4 +21,20 @@ pipeline {
             }
         }
     }
+
+    post {
+
+        always{
+
+            deleteDir()
+        }
+        success{
+
+            echo "PIPELINE WAS SUCCESS"
+        }
+        failure{
+
+            echo "PIPELINE GETS FAILURE"
+        }
+    }
 }
