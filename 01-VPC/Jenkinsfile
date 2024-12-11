@@ -33,13 +33,13 @@ pipeline {
                 withAWS(region: 'us-east-1', credentials: 'aws-auth'){
 
                     sh """
-                    cd 01-VPC
-                    if [ ${params.PICKONE} == 'apply' ]
-                    then
-                        terraform apply -auto-approve
-                    elif [ ${params.PICKONE} == 'destroy' ]
-                        terraform destroy -auto-approve
-                    fi
+                        cd 01-VPC
+                        if [ ${params.PICKONE} == 'apply' ]
+                        then
+                            terraform apply -auto-approve
+                        elif [ ${params.PICKONE} == 'destroy' ]
+                            terraform destroy -auto-approve
+                        fi
                    """
                 }
             }
