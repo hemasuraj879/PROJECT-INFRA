@@ -3,7 +3,7 @@ pipeline {
   agent { label 'agent-1' } 
 
   parameters{
-    choice(name: 'PICK ONE', choices: ['apply', 'destroy'], description: 'Pick Apply or destroy')
+    choice(name: 'CHOOSE', choices: ['apply', 'destroy'], description: 'Pick Apply or destroy')
   }
 
   stages{
@@ -32,10 +32,10 @@ pipeline {
 
           sh """
             cd 01-VPC
-            if [ ${params.PICK ONE} == 'apply' ]
+            if [ ${params.CHOOSE} == 'apply' ]
             then
               terraform apply -auto-approve vpc.txt
-            elif [ ${params.PICK ONE} == 'destroy' ]
+            elif [ ${params.CHOOSE} == 'destroy' ]
             then
               terraform destroy -auto-approve
             fi
