@@ -1,64 +1,60 @@
 pipeline {
 
-    agent { label 'agent-1' } 
+  agent { label 'agent-1' } 
 
-    parameters{
-        
-        choice(name: 'PICK ONE', choices: ['apply', 'destroy'], description: 'Pick Apply or destroy')
+  parameters{
+    choice(name: 'PICK ONE', choices: ['apply', 'destroy'], description: 'Pick Apply or destroy')
+  }
+
+  stages{
+
+    stage('INIT AND PLAN'){
+
+      steps{
+
+        withAWS(region: 'us-east-1', credentials: 'aws-auth'){
+
+          sh """
+            cd 01-VPC
+            terraform init -upgrade
+            terraform init -reconfigure
+            terraform plan -out=vpc.txt
+          """
+        }
+      }
     }
 
-    stages{
+    stage('APPLY OR DESTROY'){
 
-        stage('INIT AND PLAN'){
+      steps{
 
-            steps{
+        withAWS(region: 'us-east-1', credentials: 'aws-auth'){
 
-                withAWS(region: 'us-east-1', credentials: 'aws-auth'){
-
-                    sh """
-                        cd 01-VPC
-                        terraform init -upgrade
-                        terraform init -reconfigure
-                        terraform plan -out=vpc.txt
-
-                    """
-                }
-            }
+          sh """
+            cd 01-VPC
+            if [ ${params.PICKONE} == 'apply' ]
+            then
+              terraform apply -auto-approve vpc.txt
+            elif [ ${params.PICKONE} == 'destroy' ]
+            then
+              terraform destroy -auto-approve
+            fi
+          """
         }
-
-        stage('APPLY OR DESTROY'){
-
-            steps{
-
-                withAWS(region: 'us-east-1', credentials: 'aws-auth'){
-
-                    sh """
-                        cd 01-VPC
-                        if [ ${params.PICKONE} == 'apply' ]
-                        then
-                            terraform apply -auto-approve vpc.txt
-                        elif [ ${params.PICKONE} == 'destroy' ]
-                            terraform destroy -auto-approve
-                        fi
-                   """
-                }
-            }
-        }
+      }
     }
+  }
 
-    post {
+  post {
 
-        always{
-
-            deleteDir()
-        }
-        success{
-
-            echo "PIPELINE WAS SUCCESS"
-        }
-        failure{
-
-            echo "PIPELINE GETS FAILURE"
-        }
+    always{
+      deleteDir()
     }
+    success{
+      echo "PIPELINE WAS SUCCESS"
+    }
+    failure{
+      echo "PIPELINE GETS FAILURE"
+    }
+  }
 }
